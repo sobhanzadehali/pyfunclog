@@ -1,6 +1,6 @@
 import pytest
 import logging
-from src.pyfunclog import secure_log_function, SecureFunctionLogger
+from pyfunclog import secure_log_function, SecureFunctionLogger
 
 class TestSecureFunctionLogger:
     def test_basic_function_logging(self, caplog):
@@ -32,6 +32,7 @@ class TestSecureFunctionLogger:
             
         # Check that sensitive data is masked
         assert "secret123" not in caplog.text
+        assert "sk_live" not in caplog.text
         assert "****" in caplog.text
 
 if __name__ == "__main__":

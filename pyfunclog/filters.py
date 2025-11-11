@@ -5,7 +5,6 @@ from typing import Any, Dict, List
 class SensitiveDataDetector:
     """
     Detect and mask sensitive data in log messages
-    Based on filtering approaches from Python logging documentation
     """
     
     def __init__(self):
@@ -51,7 +50,7 @@ class SensitiveDataDetector:
             return value[:4] + "*" * (len(value) - 8) + value[-4:]
 
     def _matches_sensitive_pattern(self, value: str) -> bool:
-        """Detect sensitive data patterns in values[citation:3]"""
+        """Detect sensitive data patterns in values"""
         patterns = [
             r'^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$',  # JWT
             r'^[a-f0-9]{20,}$',  # Long hex strings
@@ -63,7 +62,7 @@ class SensitiveDataDetector:
 
 class SensitiveDataFilter(logging.Filter):
     """
-    Logging filter to mask sensitive data in log records[citation:3][citation:7]
+    Logging filter to mask sensitive data in log records
     """
     
     def __init__(self, name: str = ""):

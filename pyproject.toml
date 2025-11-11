@@ -1,17 +1,17 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm"]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyfunclog"
-dynamic = ["version"]
-description = "Comprehensive function logging with sensitive data protection"
+version = "1.0.0"
+description = "Comprehensive function logging with async support and sensitive data protection"
 readme = "README.md"
 authors = [
-    {name = "sobhan", email = "sobhan.za47@gmail.com"}
+    {name = "sobhan zadehali", email = "sobhan.za47@gmail.com"}
 ]
 license = {text = "MIT"}
-keywords = ["logging", "debugging", "sensitive-data", "monitoring"]
+keywords = ["logging", "debugging", "security", "async", "fastapi", "sensitive-data"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -28,19 +28,23 @@ classifiers = [
     "Topic :: System :: Logging",
 ]
 dependencies = []
-requires-python = ">=3.8"
+
+[project.optional-dependencies]
+fastapi = [
+    "fastapi>=0.68.0",
+    "starlette>=0.14.0",
+]
+dev = [
+    "pytest>=6.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov",
+    "black",
+    "isort",
+    "flake8",
+]
 
 [project.urls]
 Homepage = "https://github.com/sobhanzadehali/pyfunclog"
 Documentation = "https://github.com/sobhanzadehali/pyfunclog#readme"
 Repository = "https://github.com/sobhanzadehali/pyfunclog"
 Issues = "https://github.com/sobhanzadehali/pyfunclog/issues"
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=6.0",
-    "pytest-cov",
-    "black",
-    "isort",
-    "flake8",
-]

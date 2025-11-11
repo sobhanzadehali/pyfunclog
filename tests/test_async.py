@@ -3,8 +3,9 @@ import asyncio
 import logging
 from pyfunclog import async_secure_log_function, AsyncFunctionLogger, universal_log
 
+pytestmark = pytest.mark.asyncio
+
 class TestAsyncFunctions:
-    @pytest.mark.asyncio
     async def test_async_function_logging(self, caplog):
         """Test that async functions are properly logged"""
         logger = AsyncFunctionLogger()
@@ -12,7 +13,7 @@ class TestAsyncFunctions:
         @async_secure_log_function(logger)
         async def async_add(x, y):
             result = x + y
-            await asyncio.sleep(0.01)  # Simulate async work
+            await asyncio.sleep(0.01)
             intermediate = result * 2
             return intermediate
         
@@ -23,7 +24,6 @@ class TestAsyncFunctions:
         assert "async_add" in caplog.text
         assert "async" in caplog.text.lower()
 
-    @pytest.mark.asyncio 
     async def test_async_function_with_sensitive_data(self, caplog):
         """Test async function with sensitive data masking"""
         
@@ -38,9 +38,10 @@ class TestAsyncFunctions:
             await async_auth("john", "secret123")
             
         # Verify sensitive data is masked
-        assert "secret123" not in caplog.text
-        assert "sk_live" not in caplog.text
-        assert "****" in caplog.text
+        log_output = caplog.text
+        assert "secret123" not in log_output
+        assert "sk_live" not in log_output
+        assert "****" in log_output
 
     def test_universal_decorator_sync(self, caplog):
         """Test universal decorator with sync function"""
@@ -55,7 +56,6 @@ class TestAsyncFunctions:
         assert result == 10
         assert "sync_function" in caplog.text
 
-    @pytest.mark.asyncio
     async def test_universal_decorator_async(self, caplog):
         """Test universal decorator with async function"""
         
@@ -70,7 +70,6 @@ class TestAsyncFunctions:
         assert result == 10
         assert "async_function" in caplog.text
 
-    @pytest.mark.asyncio
     async def test_async_exception_handling(self, caplog):
         """Test async function exception logging"""
         

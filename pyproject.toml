@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyfunclog"
-version = "1.0.0"
+version = "2.0.1"
 description = "Comprehensive function logging with async support and sensitive data protection"
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     {name = "sobhan zadehali", email = "sobhan.za47@gmail.com"}
 ]
@@ -18,6 +18,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -28,6 +29,7 @@ classifiers = [
     "Topic :: System :: Logging",
 ]
 dependencies = []
+requires-python = ">=3.7"
 
 [project.optional-dependencies]
 fastapi = [
@@ -37,10 +39,10 @@ fastapi = [
 dev = [
     "pytest>=6.0",
     "pytest-asyncio>=0.21.0",
-    "pytest-cov",
-    "black",
-    "isort",
-    "flake8",
+    "pytest-cov>=2.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "flake8>=4.0",
 ]
 
 [project.urls]
@@ -48,3 +50,18 @@ Homepage = "https://github.com/sobhanzadehali/pyfunclog"
 Documentation = "https://github.com/sobhanzadehali/pyfunclog#readme"
 Repository = "https://github.com/sobhanzadehali/pyfunclog"
 Issues = "https://github.com/sobhanzadehali/pyfunclog/issues"
+
+[project.scripts]
+pyfunclog-demo = "pyfunclog.examples.basic_usage:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyfunclog*"]
+exclude = ["tests*", "examples*", "dist*", "build*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

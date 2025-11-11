@@ -132,7 +132,9 @@ def universal_log(logger: Optional[SecureFunctionLogger] = None):
     """Universal decorator that works for both sync and async functions"""
     def decorator(func):
         if asyncio.iscoroutinefunction(func):
+            # Use async decorator for async functions
             return async_secure_log_function(logger)(func)
         else:
+            # Use sync decorator for sync functions
             return secure_log_function(logger)(func)
     return decorator

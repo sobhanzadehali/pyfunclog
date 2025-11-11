@@ -2,8 +2,8 @@ import logging
 import pytest
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
-from src.pyfunclog.async_support import FastAPILoggingSupport
-from src.pyfunclog import async_secure_log_function
+from pyfunclog.async_support import FastAPILoggingSupport
+from pyfunclog import async_secure_log_function
 
 class TestFastAPI:
     def test_fastapi_middleware(self):

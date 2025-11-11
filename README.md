@@ -55,3 +55,15 @@ async def get_user(user_id: int, token: str):
     # token will be automatically masked
     return {"user_id": user_id, "name": "John Doe"}
 ```
+
+## configure logging
+```python
+from pyfunclog import configure_logging
+
+# Configure logging
+configure_logging(
+    level="DEBUG",
+    format_string='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename="app.log"
+)
+```

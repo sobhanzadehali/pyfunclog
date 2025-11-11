@@ -3,7 +3,7 @@ import logging
 import json
 import asyncio
 from functools import wraps
-from typing import Any, Dict, Optional, Callable, Union, Awaitable
+from typing import Any, Dict, Optional, Callable
 from datetime import datetime
 from .filters import SensitiveDataDetector, SensitiveDataFilter
 
@@ -42,13 +42,18 @@ class SecureFunctionLogger:
         func_name = func.__name__
         module_name = func.__module__
         
+        # Apply sensitive data filtering to all data
+        safe_args = self._serialize_args(args, kwargs, func)
+        safe_locals = self._serialize_locals(locals_dict)
+        safe_return = self._safe_serialize(return_value)
+        
         log_data = {
             "timestamp": datetime.now().isoformat(),
             "function": f"{module_name}.{func_name}",
             "type": "async" if is_async else "sync",
-            "args": self._serialize_args(args, kwargs, func),
-            "locals": self._serialize_locals(locals_dict),
-            "return_value": self._safe_serialize(return_value),
+            "args": safe_args,
+            "locals": safe_locals,
+            "return_value": safe_return,
             "exception": str(exception) if exception else None,
         }
         
@@ -112,13 +117,30 @@ class SecureFunctionLogger:
 # Global logger instance
 _default_logger = SecureFunctionLogger()
 
+def _capture_locals(func: Callable) -> Dict[str, Any]:
+    """Helper function to capture local variables from the calling frame"""
+    frame = inspect.currentframe()
+    try:
+        # Go back through the call stack to find the function's frame
+        # This is a simplified approach that works for most cases
+        for _ in range(5):  # Limit stack navigation depth
+            frame = frame.f_back
+            if frame is None:
+                break
+            # Check if this is the function's frame
+            if hasattr(frame, 'f_code') and frame.f_code == func.__code__:
+                return frame.f_locals.copy()
+    except Exception:
+        pass
+    finally:
+        # Important: avoid reference cycles
+        del frame
+    
+    return {}
+
 def secure_log_function(logger: Optional[SecureFunctionLogger] = None):
     """Main decorator for synchronous function logging"""
     def decorator(func):
-        if asyncio.iscoroutinefunction(func):
-            # Handle async functions with sync decorator - redirect to async version
-            return async_secure_log_function(logger)(func)
-            
         @wraps(func)
         def wrapper(*args, **kwargs):
             local_logger = logger or _default_logger
@@ -129,24 +151,19 @@ def secure_log_function(logger: Optional[SecureFunctionLogger] = None):
             try:
                 return_value = func(*args, **kwargs)
                 
-                # Capture local variables from function frame
-                frame = inspect.currentframe()
-                try:
-                    for _ in range(2):  # Navigate to function frame
-                        frame = frame.f_back
-                        if frame is None:
-                            break
-                    
-                    if frame and frame.f_code == func.__code__:
-                        locals_dict = frame.f_locals.copy()
-                finally:
-                    del frame
+                # Capture local variables
+                locals_dict = _capture_locals(func)
                 
                 local_logger.log_function_call(func, args, kwargs, locals_dict, return_value, is_async=False)
                 return return_value
                 
             except Exception as e:
                 exception = e
+                # Try to capture locals even when there's an exception
+                try:
+                    locals_dict = _capture_locals(func)
+                except Exception:
+                    pass
                 local_logger.log_function_call(func, args, kwargs, locals_dict, return_value, exception, is_async=False)
                 raise
         
@@ -156,10 +173,6 @@ def secure_log_function(logger: Optional[SecureFunctionLogger] = None):
 def async_secure_log_function(logger: Optional[SecureFunctionLogger] = None):
     """Decorator for asynchronous function logging"""
     def decorator(func):
-        if not asyncio.iscoroutinefunction(func):
-            # Handle sync functions with async decorator - redirect to sync version
-            return secure_log_function(logger)(func)
-            
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
             local_logger = logger or _default_logger
@@ -170,23 +183,13 @@ def async_secure_log_function(logger: Optional[SecureFunctionLogger] = None):
             try:
                 return_value = await func(*args, **kwargs)
                 
-                # For async functions, we need a different approach to capture locals
-                # We'll use a sync wrapper inside the async function to capture the frame
-                def capture_locals_sync():
-                    frame = inspect.currentframe()
-                    try:
-                        for _ in range(3):  # Navigate through async wrapper to function frame
-                            frame = frame.f_back
-                            if frame is None:
-                                break
-                        
-                        if frame and frame.f_code == func.__code__:
-                            return frame.f_locals.copy()
-                    finally:
-                        del frame
-                    return {}
-                
-                locals_dict = capture_locals_sync()
+                # For async functions, local capture is more limited
+                # We use a simplified approach
+                try:
+                    locals_dict = _capture_locals(func)
+                except Exception:
+                    # If we can't capture locals, at least log the function call
+                    locals_dict = {"_note": "Local variable capture limited in async functions"}
                 
                 local_logger.log_function_call(func, args, kwargs, locals_dict, return_value, is_async=True)
                 return return_value

@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfunclog"
+dynamic = ["version"]
+description = "Comprehensive function logging with sensitive data protection"
+readme = "README.md"
+authors = [
+    {name = "sobhan", email = "sobhan.za47@gmail.com"}
+]
+license = {text = "MIT"}
+keywords = ["logging", "debugging", "sensitive-data", "monitoring"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Debugging",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Logging",
+]
+dependencies = []
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/sobhanzadehali/pyfunclog"
+Documentation = "https://github.com/sobhanzadehali/pyfunclog#readme"
+Repository = "https://github.com/sobhanzadehali/pyfunclog"
+Issues = "https://github.com/sobhanzadehali/pyfunclog/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "black",
+    "isort",
+    "flake8",
+]
